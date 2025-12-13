@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Illness Health Insurance - Risk Details</title>
+    <link rel="stylesheet" href="../css/p1102.css">
+</head>
+<body>
+<div class="risk-container">
+    <header>
+        <h2>🏥 Illness Health Insurance - Risk Details</h2>
+        <button onclick="goBack()">⬅ Back</button>
+    </header>
+
+    <div class="risk-form">
+        <div class="form-group">
+            <label>Policy Number</label>
+            <input type="text" id="policyNo" placeholder="Auto generated" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Insured Age</label>
+            <input type="number" id="age" placeholder="Enter insured age">
+        </div>
+
+        <div class="form-group">
+            <label>Pre-existing Conditions</label>
+            <textarea id="conditions" rows="3" placeholder="Mention if any (e.g., diabetes, BP)"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Hospital Network</label>
+            <select id="hospitalNetwork">
+                <option value="">-- Select --</option>
+                <option>Cashless</option>
+                <option>Reimbursement</option>
+            </select>
+        </div>
+
+        <button class="submit-btn" onclick="submitRisk1102()">Submit Risk</button>
+    </div>
+</div>
+<script src="../js/p1102.js"></script>
+</body>
+</html>

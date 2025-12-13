@@ -1,0 +1,111 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f7fc;
+  margin: 0;
+  padding: 0;
+}
+
+.proposal-container {
+  max-width: 950px;
+  margin: 50px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h2 {
+  margin: 0;
+  color: #007bff;
+  font-size: 26px;
+}
+
+.home-btn {
+  background-color: #17a2b8;
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.section {
+  margin-top: 30px;
+}
+
+.section h3 {
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 4px;
+  font-size: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.fetch-btn {
+  background-color: #007bff;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  color: #fff;
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+.fetch-green {
+  background-color: #28a745 !important;
+}
+
+.customer-box {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+.policy-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.left-side,
+.right-side {
+  flex: 1;
+}
+
+.submit-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 25px;
+}

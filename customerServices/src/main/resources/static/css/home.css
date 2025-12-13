@@ -1,0 +1,89 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background-color: #f7f9fc;
+  color: #333;
+}
+
+/* --- Apply only to home --- */
+.home-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* --- Top Bar --- */
+.home-container .top {
+  background-color: #004aad;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+}
+
+.home-container .brand {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.home-container .top-buttons button {
+  background-color: white;
+  color: #004aad;
+  border: none;
+  padding: 8px 15px;
+  margin-left: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.home-container .top-buttons button:hover {
+  background-color: #dce9ff;
+}
+
+/* --- Down Section --- */
+.home-container .down {
+  flex: 1;
+  background-color: #ffffff;
+  border-top: 1px solid #ddd;
+  padding: 30px 60px;
+  overflow-y: auto;
+}
+
+.home-container .down h1 {
+  color: #004aad;
+  text-align: center;
+}
+
+.home-container .down p {
+  text-align: center;
+  font-size: 18px;
+  color: #444;
+}
+
+.home-container .intro,
+.home-container .overview {
+  width: 80%;
+  margin: 30px auto;
+  background: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.home-container .intro h3,
+.home-container .overview h3 {
+  color: #004aad;
+  margin-bottom: 10px;
+}
+
+.home-container .intro ul {
+  list-style: none;
+  padding: 0;
+}
+
+.home-container .intro ul li {
+  margin: 8px 0;
+  font-size: 16px;
+}

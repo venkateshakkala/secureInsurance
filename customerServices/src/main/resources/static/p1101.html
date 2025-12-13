@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Full Health Insurance - Risk Details</title>
+    <link rel="stylesheet" href="../css/p1101.css">
+</head>
+<body>
+
+<div class="risk-container">
+
+    <!-- Header -->
+    <div class="header">
+        <h2>🏥 Full Health Insurance - Risk & Cover Details</h2>
+        <button id="btnHome">🏠 Home</button>
+    </div>
+
+    <!-- Risk Section -->
+    <section class="risk-section">
+        <div class="section-header">
+            <h3>Risk Details</h3>
+            <button id="btnAddRisk">➕ Add Risk</button>
+        </div>
+        <table id="riskTable">
+            <thead>
+            <tr>
+                <th>Insured Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Relation</th>
+                <th>Occupation</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <!-- Cover Section -->
+    <section class="cover-section">
+        <div class="section-header">
+            <h3>Cover Details</h3>
+            <button id="btnAddCover">➕ Add Cover</button>
+        </div>
+        <table id="coverTable">
+            <thead>
+            <tr>
+                <th>Cover Code</th>
+                <th>Cover Name</th>
+                <th>Sum Insured (₹)</th>
+                <th>Premium (₹)</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <!-- Buttons for premium & save -->
+    <div class="action-buttons">
+        <button id="btnViewPremium">💰 View Premium</button>
+        <button id="btnSaveProposal">💾 Save Proposal</button>
+    </div>
+
+</div>
+
+<!-- Risk Modal -->
+<div id="riskModal" class="modal">
+    <div class="modal-content">
+        <h3>Add Risk Details</h3>
+        <label>Insured Person Name</label>
+        <input type="text" id="rName">
+        <label>Age</label>
+        <input type="number" id="rAge">
+        <label>Gender</label>
+        <select id="rGender">
+            <option value="">-- Select Gender --</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+        </select>
+        <label>Relation</label>
+        <select id="rRelation">
+            <option>Self</option>
+            <option>Spouse</option>
+            <option>Child</option>
+            <option>Parent</option>
+        </select>
+        <label>Occupation</label>
+        <input type="text" id="rOccupation" placeholder="e.g. Engineer">
+        <div class="modal-actions">
+            <button id="saveRisk">Save</button>
+            <button id="closeRisk">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Cover Modal -->
+<div id="coverModal" class="modal">
+    <div class="modal-content">
+        <h3>Add Cover Details</h3>
+
+        <label>Cover Name</label>
+        <select id="cName">
+            <option value="">-- Select Cover --</option>
+        </select>
+
+        <label>Cover Code</label>
+        <input type="text" id="cCode" readonly>
+
+        <label>Sum Insured (₹)</label>
+        <input type="number" id="cSumInsured" placeholder="Enter sum insured">
+
+        <label>Premium (₹)</label>
+        <input type="number" id="cPremium" readonly>
+
+        <div class="modal-actions">
+            <button id="saveCover">Save</button>
+            <button id="closeCover">Cancel</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="../js/p1101.js"></script>
+</body>
+</html>
