@@ -27,11 +27,11 @@ public class ProposalController {
                     .body(new ResponseDto("400", "Mobile number is required"));
         }
 
-        iProposalService.createProposal(proposalDto);
+        String proposalNumber = iProposalService.createProposal(proposalDto);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ResponseDto("201", "Proposal created successfully"));
+                .body(new ResponseDto("201", "Proposal created successfully "+ proposalNumber));
     }
 
 

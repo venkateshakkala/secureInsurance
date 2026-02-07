@@ -4,7 +4,7 @@ import com.secureInsurance.proposal.services.dto.FullProposalDto;
 import com.secureInsurance.proposal.services.dto.ProposalDto;
 
 public interface IProposalService {
-    void createProposal(ProposalDto proposalDto);
+    String createProposal(ProposalDto proposalDto);
     FullProposalDto fetchProposal(String proposalNumber);
 
 }

@@ -21,7 +21,7 @@ public class CustomerServiceImpl implements ICustomerService {
     public void crateCustomer(CustomerDto customerDto) {
         Optional<Customer> optionalCustomer= customerRepository.findByMobileNumber(customerDto.getMobileNumber());
         if(optionalCustomer.isPresent()){
-            throw new CustomerAlreadyExitsException("customer is alreday present with this mobile number" + customerDto.getMobileNumber());
+            throw new CustomerAlreadyExitsException("customer is already present with this mobile number" + customerDto.getMobileNumber());
         }
         Customer customer = new Customer();
         customer.setFirstName(customerDto.getFirstName());

@@ -3,22 +3,27 @@ package com.secureInsurance.proposal.services.service.impl;
 import com.secureInsurance.proposal.services.dao.CoverDao;
 import com.secureInsurance.proposal.services.dao.RiskDao;
 import com.secureInsurance.proposal.services.dto.*;
+import com.secureInsurance.proposal.services.entity.CustomerMapProposal;
 import com.secureInsurance.proposal.services.entity.ProposalDetails;
 import com.secureInsurance.proposal.services.feignClient.CustomerClient;
 import com.secureInsurance.proposal.services.feignClient.DropDownFeignClient;
 import com.secureInsurance.proposal.services.mapper.ProposalMapper;
+import com.secureInsurance.proposal.services.repository.CustomerMapProposalRepository;
 import com.secureInsurance.proposal.services.repository.ProposalRepository;
 import com.secureInsurance.proposal.services.service.IProposalService;
 import com.secureInsurance.proposal.services.utility.ProposalNumberGenerator;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class ProposalImpl implements IProposalService {
 
     private final ProposalRepository proposalRepository;
+    private final CustomerMapProposalRepository customerMapProposalRepository;
     private final RiskDao riskDao;
     private final CoverDao coverDao;
     private final CustomerClient customerClient;
@@ -26,12 +31,11 @@ public class ProposalImpl implements IProposalService {
     private final ProposalMapper proposalMapper;
 
     @Override
-    public void createProposal(ProposalDto proposalDto) {
+    @Transactional
+    public String createProposal(ProposalDto proposalDto) {
 
         ProposalDetails proposal = new ProposalDetails();
-        System.out.println("MOBILE FROM UI = " + proposalDto.getMobileNumber());
         CustomerDto customerDto = customerClient.getCustomerByMobileNumber(proposalDto.getMobileNumber());
-        System.out.println("MOBILE FROM UI = " + proposalDto.getMobileNumber());
         //Department Dropdown
         List<DepartmentDto> departmentDtoList = dropDownFeignClient.getDepartments();
         DepartmentDto departmentDto = departmentDtoList.stream()
@@ -50,7 +54,7 @@ public class ProposalImpl implements IProposalService {
 
         proposal.setProductCode(productDto.getProductCode());
         proposal.setProductName(productDto.getProductName());
-        System.out.println(productDto.getProductCode());
+
 
         //Customer data
         proposal.setCustomerId(customerDto.getCustomerId());
@@ -74,6 +78,13 @@ public class ProposalImpl implements IProposalService {
         proposal.setGst(proposalDto.getGst());
         proposal.setTotalPremium(proposalDto.getTotalPremium());
 
+        //mapping customer and proposal
+        CustomerMapProposal customerMapProposal = new CustomerMapProposal();
+        customerMapProposal.setProposalNumber(proposalNumber);
+        customerMapProposal.setCustomerId(customerDto.getCustomerId());
+        customerMapProposal.setMobileNumber(customerDto.getMobileNumber());
+        customerMapProposalRepository.save(customerMapProposal);
+
         proposalRepository.save(proposal);
 
         if (proposalDto.getRisks() != null) {
@@ -83,6 +94,7 @@ public class ProposalImpl implements IProposalService {
         if (proposalDto.getCovers() != null) {
             proposalDto.getCovers().forEach(c -> coverDao.saveCover(proposalNumber, c));
         }
+        return proposalNumber;
     }
 
     @Override
@@ -96,18 +108,41 @@ public class ProposalImpl implements IProposalService {
 
         ProposalDto proposalDto = proposalMapper.mapToProposalDto(proposalDetails);
 
-        //CustomerDto customerDto = customerClient.getCustomerByMobileNumber(proposalDto.getCustomerName());
-
         List<RiskDto> risks = riskDao.getRisksByProposal(proposalNumber);
 
         List<CoverDto> covers = coverDao.getCoversByProposal(proposalNumber);
+        //Map ProposalData
+        CustomerMapProposal customerMapProposal = customerMapProposalRepository
+                .findByProposalNumber(proposalNumber)
+                .orElseThrow(() -> new RuntimeException("Customer proposal map not found " + proposalNumber));
+        String mobileNumber = customerMapProposal.getMobileNumber();
+        CustomerDto customerDto = customerClient.getCustomerByMobileNumber(mobileNumber);
 
-        FullProposalDto full = new FullProposalDto();
-        full.setProposalDto(proposalDto);
-        //full.setCustomerDto(customerDto);
-        full.setRiskDto(risks);
-        full.setCoverDto(covers);
+        // Fetch Department
+        DepartmentDto departmentDto = dropDownFeignClient.getDepartments()
+                .stream()
+                .filter(d -> d.getDepartmentCode().equals(proposalDetails.getDepartmentCode()))
+                .findFirst()
+                .orElse(null);
 
-        return full;
+        // Fetch Product
+        ProductDto productDto = dropDownFeignClient
+                .getProductsByDepartment(proposalDetails.getDepartmentCode())
+                .stream()
+                .filter(p -> p.getProductCode().equals(proposalDetails.getProductCode()))
+                .findFirst()
+                .orElse(null);
+
+        FullProposalDto fullProposalDto = new FullProposalDto();
+        fullProposalDto.setProposalDto(proposalDto);
+        fullProposalDto.setCustomerDto(customerDto);
+        fullProposalDto.setRiskDto(risks);
+        fullProposalDto.setCoverDto(covers);
+        fullProposalDto.setDepartmentDto(departmentDto);
+        fullProposalDto.setProductDto(productDto);
+
+
+
+        return fullProposalDto;
     }
 }

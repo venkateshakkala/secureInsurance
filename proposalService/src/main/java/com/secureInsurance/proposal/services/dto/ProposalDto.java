@@ -3,6 +3,7 @@ package com.secureInsurance.proposal.services.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
+import javax.xml.transform.sax.SAXResult;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -10,15 +11,13 @@ import java.util.List;
 @Data
 public class ProposalDto {
 
-      //private long customerId;
-//    private String customerName;
+    //private String proposalNumber;
+
     private String mobileNumber;
 
     private String departmentCode;
-    //private String departmentName;
 
     private String productCode;
-    //private String productName;
 
     private long totalSumInsured;
     private long netPremium;

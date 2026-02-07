@@ -9,33 +9,56 @@
 
 <div class="proposal-container">
 
-    <!-- Header -->
+    <!-- ================= HEADER ================= -->
     <div class="header">
         <h2>🛡️ Proposal Details</h2>
-        <button id="btnHome" class="home-btn">🏠 Home</button>
+        <button id="btnHome" type="button" class="home-btn">🏠 Home</button>
     </div>
 
-    <!-- Customer & Proposal Section -->
+    <!-- ================= CUSTOMER & PROPOSAL ================= -->
     <div class="section">
         <h3>👤 Customer & Proposal Information</h3>
 
         <div class="form-group">
             <label>Proposal Number</label>
-            <input type="text" id="proposalNumber" placeholder="Enter proposal number">
+            <input
+                    type="text"
+                    id="proposalNumber"
+                    placeholder="Enter proposal number">
         </div>
 
         <div class="form-group">
             <label>Mobile Number</label>
-            <input type="text" id="mobileNumber" placeholder="Enter mobile number">
+            <input
+                    type="text"
+                    id="mobileNumber"
+                    placeholder="Enter mobile number">
 
-            <button id="btnFetchCustomer" class="fetch-btn">Fetch Customer</button>
-            <button id="btnFetchProposal" class="fetch-btn fetch-green">Fetch Proposal</button>
+            <div class="btn-row">
+                <button
+                        id="btnFetchCustomer"
+                        type="button"
+                        class="fetch-btn">
+                    Fetch Customer
+                </button>
 
-            <a href="../register.html" class="register-link">New Customer? Register</a>
+                <button
+                        id="btnFetchProposal"
+                        type="button"
+                        class="fetch-btn fetch-green">
+                    Fetch Proposal
+                </button>
+            </div>
+
+            <a href="../register.html" class="register-link">
+                New Customer? Register
+            </a>
         </div>
 
-        <!-- Customer Information -->
-        <div id="customerDataSection" class="customer-box" style="display:none;">
+        <!-- ================= CUSTOMER DETAILS ================= -->
+        <div id="customerDataSection"
+             class="customer-box"
+             style="display:none;">
             <p><strong>Customer ID:</strong> <span id="customerId"></span></p>
             <p><strong>Name:</strong> <span id="customerName"></span></p>
             <p><strong>Email:</strong> <span id="customerEmail"></span></p>
@@ -43,21 +66,28 @@
         </div>
     </div>
 
-    <!-- Policy Section -->
+    <!-- ================= POLICY INFORMATION ================= -->
     <div class="section">
         <h3>📄 Policy Information</h3>
 
         <div class="policy-grid">
 
+            <!-- LEFT -->
             <div class="left-side">
+
                 <div class="form-group">
                     <label>Policy Start Date</label>
-                    <input type="date" id="startDate" onchange="updateEndDate()">
+                    <input
+                            type="date"
+                            id="startDate"
+                            onchange="updateEndDate()">
                 </div>
 
                 <div class="form-group">
                     <label>Policy Tenure (Years)</label>
-                    <select id="tenure" onchange="updateEndDate()">
+                    <select
+                            id="tenure"
+                            onchange="updateEndDate()">
                         <option value="">-- Select Tenure --</option>
                         <option value="1">1 Year</option>
                         <option value="2">2 Years</option>
@@ -67,11 +97,17 @@
 
                 <div class="form-group">
                     <label>Policy End Date</label>
-                    <input type="date" id="endDate" readonly>
+                    <input
+                            type="date"
+                            id="endDate"
+                            readonly>
                 </div>
+
             </div>
 
+            <!-- RIGHT -->
             <div class="right-side">
+
                 <div class="form-group">
                     <label>Department (LOB)</label>
                     <select id="department"></select>
@@ -86,15 +122,24 @@
                     <label>Remarks</label>
                     <textarea id="remarks"></textarea>
                 </div>
+
             </div>
 
         </div>
     </div>
 
-    <button id="btnNext" class="submit-btn">Next ➜ Risk Details</button>
+    <!-- ================= NEXT BUTTON ================= -->
+    <button
+            id="btnNext"
+            type="button"
+            class="submit-btn">
+        Next ➜ Risk Details
+    </button>
 
 </div>
 
+<!-- ================= JS ================= -->
 <script src="../js/proposal.js"></script>
+
 </body>
 </html>

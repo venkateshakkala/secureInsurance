@@ -12,6 +12,7 @@ public class ProposalMapper {
 
         ProposalDto proposalDto = new ProposalDto();
 
+        //proposalDto.setProposalNumber(proposalDetails.getProposalNumber());
         proposalDto.setDepartmentCode(proposalDetails.getDepartmentCode());
         proposalDto.setProductCode(proposalDetails.getProductCode());
         proposalDto.setPolicyStartDate(proposalDetails.getPolicyStartDate());
@@ -31,6 +32,7 @@ public class ProposalMapper {
 
         ProposalDetails proposalDetails = new ProposalDetails();
 
+        //proposalDetails.setProposalNumber(dto.getProposalNumber());
         proposalDetails.setDepartmentCode(dto.getDepartmentCode());
         proposalDetails.setProductCode(dto.getProductCode());
         proposalDetails.setPolicyStartDate(dto.getPolicyStartDate());

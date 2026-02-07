@@ -6,5 +6,5 @@ import lombok.Data;
 public class ProductDto {
     String productCode;
     String productName;
-    String departmentName;
+    String departmentCode;
 }

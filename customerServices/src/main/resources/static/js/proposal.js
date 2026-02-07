@@ -69,9 +69,6 @@ async function fetchCustomer() {
 }
 
 
-/* ============================================================
-   FETCH PROPOSAL (EDIT FLOW)
-============================================================ */
 async function fetchProposal() {
 
   const proposalNumber = document
@@ -86,7 +83,7 @@ async function fetchProposal() {
 
   try {
     const res = await fetch(
-      `http://localhost:8090/secureInsurance/proposal/${proposalNumber}`
+      `http://localhost:8092/proposal/fetch/${proposalNumber}`
     );
 
     if (!res.ok) {
@@ -95,7 +92,19 @@ async function fetchProposal() {
     }
 
     const proposal = await res.json();
+
     populateProposal(proposal);
+
+    // ✅ STORE FOR p1101.js
+    sessionStorage.setItem(
+      "riskDto",
+      JSON.stringify(proposal.riskDto || [])
+    );
+
+    sessionStorage.setItem(
+      "coverDto",
+      JSON.stringify(proposal.coverDto || [])
+    );
 
   } catch (err) {
     console.error(err);
@@ -104,40 +113,44 @@ async function fetchProposal() {
 }
 
 
-/* ============================================================
-   POPULATE PROPOSAL DATA
-============================================================ */
-function populateProposal(p) {
+
+function populateProposal(response) {
+
+  const proposal = response.proposalDto;
+  const customer = response.customerDto;
+  const department = response.departmentDto;
+  const product = response.productDto;
 
   document.getElementById("customerDataSection").style.display = "block";
 
-  document.getElementById("customerId").innerText = p.customerId;
+  // ---- CUSTOMER ----
+  document.getElementById("customerId").innerText = customer.customerId;
   document.getElementById("customerName").innerText =
-    p.customerName || "-";
-  document.getElementById("customerEmail").innerText =
-    p.customerEmail || "-";
-  document.getElementById("customerAddress").innerText =
-    p.customerAddress || "-";
+    `${customer.firstName} ${customer.lastName}`;
 
-  document.getElementById("startDate").value = p.policyStartDate;
-  document.getElementById("endDate").value = p.policyEndDate;
-  document.getElementById("tenure").value = p.policyTenure;
+  document.getElementById("customerEmail").innerText = customer.email;
+  document.getElementById("customerAddress").innerText = customer.address;
+  document.getElementById("mobileNumber").value = customer.mobileNumber;
 
-  document.getElementById("department").value = p.departmentCode;
+  // ---- POLICY ----
+  document.getElementById("startDate").value = proposal.policyStartDate;
+  document.getElementById("endDate").value = proposal.policyEndDate;
+  document.getElementById("tenure").value = proposal.policyTenure;
+  // ---- DEPARTMENT & PRODUCT ----
+  document.getElementById("department").value = department.departmentCode;
 
-  loadProducts(p.departmentCode, () => {
-    document.getElementById("product").value = p.productCode;
+  loadProducts(department.departmentCode, () => {
+    document.getElementById("product").value = product.productCode;
   });
 
-  document.getElementById("remarks").value = p.remarks || "";
+  document.getElementById("remarks").value = proposal.remarks || "";
 
-  // ✅ Ensure mobile is available for save
-  if (p.mobileNumber) {
-    sessionStorage.setItem("customerMobile", p.mobileNumber);
-  }
+  // ---- SESSION STORAGE ----
+  sessionStorage.setItem("customerId", customer.customerId);
+  sessionStorage.setItem("customerMobile", customer.mobileNumber);
 
-  sessionStorage.setItem("customerId", p.customerId);
 }
+
 
 
 /* ============================================================

@@ -3,11 +3,8 @@ package com.secureInsurance.proposal.services.dto;
 import lombok.Data;
 
 @Data
-public class CustomerDto {
+public class CustomerMapProposalDto {
     private long customerId;
-    private String firstName;
-    private String lastName;
     private String mobileNumber;
-    private String email;
-    private String address;
+    private String proposalNumber;
 }
