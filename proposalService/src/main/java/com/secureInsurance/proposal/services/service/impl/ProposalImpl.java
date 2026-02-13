@@ -1,5 +1,6 @@
 package com.secureInsurance.proposal.services.service.impl;
 
+import com.secureInsurance.proposal.services.Exception.CustomerServicesException;
 import com.secureInsurance.proposal.services.dao.CoverDao;
 import com.secureInsurance.proposal.services.dao.RiskDao;
 import com.secureInsurance.proposal.services.dto.*;
@@ -12,13 +13,17 @@ import com.secureInsurance.proposal.services.repository.CustomerMapProposalRepos
 import com.secureInsurance.proposal.services.repository.ProposalRepository;
 import com.secureInsurance.proposal.services.service.IProposalService;
 import com.secureInsurance.proposal.services.utility.ProposalNumberGenerator;
+import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class ProposalImpl implements IProposalService {
 
@@ -29,40 +34,51 @@ public class ProposalImpl implements IProposalService {
     private final CustomerClient customerClient;
     private final DropDownFeignClient dropDownFeignClient;
     private final ProposalMapper proposalMapper;
-
+    private JdbcTemplate jdbcTemplate;
     @Override
     @Transactional
     public String createProposal(ProposalDto proposalDto) {
 
         ProposalDetails proposal = new ProposalDetails();
-        CustomerDto customerDto = customerClient.getCustomerByMobileNumber(proposalDto.getMobileNumber());
-        //Department Dropdown
-        List<DepartmentDto> departmentDtoList = dropDownFeignClient.getDepartments();
-        DepartmentDto departmentDto = departmentDtoList.stream()
-                .filter(d -> d.getDepartmentCode().equals(proposalDto.getDepartmentCode()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Department Code not found"));
-        proposal.setDepartmentCode(departmentDto.getDepartmentCode());
-        proposal.setDepartmentName(departmentDto.getDepartmentName());
+        CustomerDto customerDto = new CustomerDto();
+        try {
+            customerDto = customerClient.getCustomerByMobileNumber(proposalDto.getMobileNumber());
+        }
+        catch (FeignException.FeignClientException e){
+            log.error("Customer services is down ");
+            throw new CustomerServicesException("Error while calling Customer services on Proposal Services");
+        }
+        catch (Exception e){
+            throw new RuntimeException("something went wrong calling Customer Services");
+        }
+            //Department Dropdown
+            List<DepartmentDto> departmentDtoList = dropDownFeignClient.getDepartments();
+            DepartmentDto departmentDto = departmentDtoList.stream()
+                    .filter(d -> d.getDepartmentCode().equals(proposalDto.getDepartmentCode()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Department Code not found"));
+            proposal.setDepartmentCode(departmentDto.getDepartmentCode());
+            proposal.setDepartmentName(departmentDto.getDepartmentName());
+            //ProductDropdown
+            List<ProductDto> productDtoList = dropDownFeignClient.getProductsByDepartment(proposalDto.getDepartmentCode());
+            ProductDto productDto = productDtoList.stream()
+                    .filter((p -> p.getProductCode().equals(proposalDto.getProductCode())))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Product code not found"));
 
-        //ProductDropdown
-        List<ProductDto> productDtoList = dropDownFeignClient.getProductsByDepartment(proposalDto.getDepartmentCode());
-        ProductDto productDto = productDtoList.stream()
-                .filter((p -> p.getProductCode().equals(proposalDto.getProductCode())))
-                        .findFirst()
-                .orElseThrow(()-> new RuntimeException("Product code not found"));
-
-        proposal.setProductCode(productDto.getProductCode());
-        proposal.setProductName(productDto.getProductName());
+            proposal.setProductCode(productDto.getProductCode());
+            proposal.setProductName(productDto.getProductName());
 
 
-        //Customer data
-        proposal.setCustomerId(customerDto.getCustomerId());
-        proposal.setCustomerName(customerDto.getFirstName() + " " + customerDto.getLastName());
+            //Customer data
+            proposal.setCustomerId(customerDto.getCustomerId());
+            proposal.setCustomerName(customerDto.getFirstName() + " " + customerDto.getLastName());
 
 
 
-        String proposalNumber = ProposalNumberGenerator.generateProposalNumber();
+        ProposalNumberGenerator proposalNumberGenerator = new ProposalNumberGenerator(jdbcTemplate);
+
+        String proposalNumber = proposalNumberGenerator.generateProposalNumber();
         proposal.setProposalNumber(proposalNumber);
         proposal.setDepartmentCode(proposalDto.getDepartmentCode());
 
@@ -81,7 +97,6 @@ public class ProposalImpl implements IProposalService {
         //mapping customer and proposal
         CustomerMapProposal customerMapProposal = new CustomerMapProposal();
         customerMapProposal.setProposalNumber(proposalNumber);
-        customerMapProposal.setCustomerId(customerDto.getCustomerId());
         customerMapProposal.setMobileNumber(customerDto.getMobileNumber());
         customerMapProposalRepository.save(customerMapProposal);
 

@@ -296,12 +296,12 @@ function populateRiskDetails(riskList) {
   const tbody = document.querySelector("#riskTable tbody");
   tbody.innerHTML = "";
 
-  if (!riskList.length) {
-    tbody.innerHTML =
-      `<tr><td colspan="6" style="text-align:center;">
-        No Risk Details Found</td></tr>`;
-    return;
-  }
+//  if (!riskList.length) {
+//    tbody.innerHTML =
+//      `<tr><td colspan="6" style="text-align:center;">
+//        No Risk Details Found</td></tr>`;
+//    return;
+//  }
 
   riskList.forEach(risk => {
     const row = tbody.insertRow();
@@ -323,12 +323,12 @@ function populateCoverDetails(coverList) {
   const tbody = document.querySelector("#coverTable tbody");
   tbody.innerHTML = "";
 
-  if (!coverList.length) {
-    tbody.innerHTML =
-      `<tr><td colspan="5" style="text-align:center;">
-        No Cover Details Found</td></tr>`;
-    return;
-  }
+//  if (!coverList.length) {
+//    tbody.innerHTML =
+//      `<tr><td colspan="5" style="text-align:center;">
+//        No Cover Details Found</td></tr>`;
+//    return;
+//  }
 
   coverList.forEach(c => {
     const row = tbody.insertRow();
