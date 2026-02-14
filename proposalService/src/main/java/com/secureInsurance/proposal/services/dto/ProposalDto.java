@@ -32,6 +32,7 @@ public class ProposalDto {
 
     private int policyTenure;
     private String remarks;
+    private String requestId;
 
     private List<RiskDto> risks;
     private List<CoverDto> covers;

@@ -70,6 +70,9 @@ public class ProposalDetails {
     @Column(name = "remarks")
     String remarks;
 
+    @Column(name = "request_id" , unique = true)
+    String requestId;
+
     @CreationTimestamp
     @Column(name = "createdAt", nullable = false, updatable = false)
     LocalDateTime localDateTime;

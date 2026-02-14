@@ -38,19 +38,24 @@ public class ProposalImpl implements IProposalService {
     @Override
     @Transactional
     public String createProposal(ProposalDto proposalDto) {
-
-        ProposalDetails proposal = new ProposalDetails();
-        CustomerDto customerDto = new CustomerDto();
         try {
-            customerDto = customerClient.getCustomerByMobileNumber(proposalDto.getMobileNumber());
-        }
-        catch (FeignException.FeignClientException e){
-            log.error("Customer services is down ");
-            throw new CustomerServicesException("Error while calling Customer services on Proposal Services");
-        }
-        catch (Exception e){
-            throw new RuntimeException("something went wrong calling Customer Services");
-        }
+                Optional<ProposalDetails> existing = proposalRepository.findByRequestId(proposalDto.getRequestId());
+                if (existing.isPresent()) {
+                    return existing.get().getProposalNumber();
+                }
+
+            ProposalDetails proposal = new ProposalDetails();
+
+
+            CustomerDto customerDto = new CustomerDto();
+            try {
+                customerDto = customerClient.getCustomerByMobileNumber(proposalDto.getMobileNumber());
+            } catch (FeignException.FeignClientException e) {
+                log.error("Customer services is down ");
+                throw new CustomerServicesException("Error while calling Customer services on Proposal Services");
+            } catch (Exception e) {
+                throw new RuntimeException("something went wrong calling Customer Services");
+            }
             //Department Dropdown
             List<DepartmentDto> departmentDtoList = dropDownFeignClient.getDepartments();
             DepartmentDto departmentDto = departmentDtoList.stream()
@@ -75,41 +80,47 @@ public class ProposalImpl implements IProposalService {
             proposal.setCustomerName(customerDto.getFirstName() + " " + customerDto.getLastName());
 
 
+            ProposalNumberGenerator proposalNumberGenerator = new ProposalNumberGenerator(jdbcTemplate);
 
-        ProposalNumberGenerator proposalNumberGenerator = new ProposalNumberGenerator(jdbcTemplate);
+            String proposalNumber = proposalNumberGenerator.generateProposalNumber();
+            proposal.setProposalNumber(proposalNumber);
+            proposal.setDepartmentCode(proposalDto.getDepartmentCode());
 
-        String proposalNumber = proposalNumberGenerator.generateProposalNumber();
-        proposal.setProposalNumber(proposalNumber);
-        proposal.setDepartmentCode(proposalDto.getDepartmentCode());
+            proposal.setProductCode(proposalDto.getProductCode());
 
-        proposal.setProductCode(proposalDto.getProductCode());
+            proposal.setPolicyStartDate(proposalDto.getPolicyStartDate());
+            proposal.setPolicyEndDate(proposalDto.getPolicyEndDate());
+            proposal.setPolicyTenure(proposalDto.getPolicyTenure());
+            proposal.setRemarks(proposalDto.getRemarks());
 
-        proposal.setPolicyStartDate(proposalDto.getPolicyStartDate());
-        proposal.setPolicyEndDate(proposalDto.getPolicyEndDate());
-        proposal.setPolicyTenure(proposalDto.getPolicyTenure());
-        proposal.setRemarks(proposalDto.getRemarks());
+            proposal.setTotalSumInsured(proposalDto.getTotalSumInsured());
+            proposal.setNetPremium(proposalDto.getNetPremium());
+            proposal.setGst(proposalDto.getGst());
+            proposal.setTotalPremium(proposalDto.getTotalPremium());
 
-        proposal.setTotalSumInsured(proposalDto.getTotalSumInsured());
-        proposal.setNetPremium(proposalDto.getNetPremium());
-        proposal.setGst(proposalDto.getGst());
-        proposal.setTotalPremium(proposalDto.getTotalPremium());
+            proposal.setRequestId(proposalDto.getRequestId());
 
-        //mapping customer and proposal
-        CustomerMapProposal customerMapProposal = new CustomerMapProposal();
-        customerMapProposal.setProposalNumber(proposalNumber);
-        customerMapProposal.setMobileNumber(customerDto.getMobileNumber());
-        customerMapProposalRepository.save(customerMapProposal);
+            //mapping customer and proposal
+            CustomerMapProposal customerMapProposal = new CustomerMapProposal();
+            customerMapProposal.setProposalNumber(proposalNumber);
+            customerMapProposal.setMobileNumber(customerDto.getMobileNumber());
+            customerMapProposalRepository.save(customerMapProposal);
 
-        proposalRepository.save(proposal);
+            proposalRepository.save(proposal);
 
-        if (proposalDto.getRisks() != null) {
-            proposalDto.getRisks().forEach(r -> riskDao.saveRiskDetails(proposalNumber, r));
+            if (proposalDto.getRisks() != null) {
+                proposalDto.getRisks().forEach(r -> riskDao.saveRiskDetails(proposalNumber, r));
+            }
+
+            if (proposalDto.getCovers() != null) {
+                proposalDto.getCovers().forEach(c -> coverDao.saveCover(proposalNumber, c));
+            }
+            return proposalNumber;
+
+    }catch (Exception e){
+            return "Error while saving proposal" + e.getMessage();
         }
 
-        if (proposalDto.getCovers() != null) {
-            proposalDto.getCovers().forEach(c -> coverDao.saveCover(proposalNumber, c));
-        }
-        return proposalNumber;
     }
 
     @Override

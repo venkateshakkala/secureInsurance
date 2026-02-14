@@ -193,94 +193,111 @@ document.getElementById("btnViewPremium").onclick = () => {
 /* ============================================================
    SAVE PROPOSAL (FIXED)
 ============================================================ */
-document.getElementById("btnSaveProposal").onclick = async () => {
+document.getElementById("btnSaveProposal").onclick = async function () {
 
-  const mobileNumber = sessionStorage.getItem("customerMobile");
-  if (!mobileNumber) {
-    alert("Customer mobile missing");
-    return;
-  }
-
-  const proposalData = {
-    mobileNumber,
-    departmentCode: sessionStorage.getItem("departmentCode"),
-    productCode: sessionStorage.getItem("productCode"),
-    policyStartDate: sessionStorage.getItem("policyStartDate"),
-    policyEndDate: sessionStorage.getItem("policyEndDate"),
-    policyTenure: Number(sessionStorage.getItem("policyTenure")),
-    remarks: sessionStorage.getItem("remarks"),
-    risks: [],
-    covers: []
-  };
-
-  document.querySelectorAll("#riskTable tbody tr").forEach(r => {
-    if (r.cells.length < 5) return;
-
-    proposalData.risks.push({
-      insuredName: r.cells[0].innerText,
-      age: Number(r.cells[1].innerText),
-      gender: r.cells[2].innerText,
-      relation: r.cells[3].innerText,
-      occupation: r.cells[4].innerText
-    });
-  });
-
-  let totalSI = 0;
-  let netPremium = 0;
-
-  document.querySelectorAll("#coverTable tbody tr").forEach(r => {
-    if (r.cells.length < 4) return; // ✅ IMPORTANT FIX
-
-    const si = Number(r.cells[2].innerText);
-    const pr = Number(r.cells[3].innerText);
-
-    totalSI += si;
-    netPremium += pr;
-
-    proposalData.covers.push({
-      coverCode: r.cells[0].innerText,
-      coverName: r.cells[1].innerText,
-      sumInsured: si,
-      premium: pr
-    });
-  });
-
-  if (proposalData.covers.length === 0) {
-    alert("❌ Please add at least one cover");
-    return;
-  }
-
-  proposalData.totalSumInsured = totalSI;
-  proposalData.netPremium = +netPremium.toFixed(2);
-  proposalData.gst = +(netPremium * 0.18).toFixed(2);
-  proposalData.totalPremium =
-    +(proposalData.netPremium + proposalData.gst).toFixed(2);
+  // ✅ prevent double click
+  if (this.disabled) return;
+  this.disabled = true;
+  this.innerText = "Saving...";
 
   try {
+
+    const mobileNumber = sessionStorage.getItem("customerMobile");
+    if (!mobileNumber) {
+      alert("Customer mobile missing");
+      this.disabled = false;
+      this.innerText = "💾 Save Proposal";
+      return;
+    }
+
+    // ✅ generate requestId (THIS IS THE KEY LINE)
+    const requestId = crypto.randomUUID();
+
+    const proposalData = {
+      requestId,   // ⭐ ADD THIS LINE
+      mobileNumber,
+      departmentCode: sessionStorage.getItem("departmentCode"),
+      productCode: sessionStorage.getItem("productCode"),
+      policyStartDate: sessionStorage.getItem("policyStartDate"),
+      policyEndDate: sessionStorage.getItem("policyEndDate"),
+      policyTenure: Number(sessionStorage.getItem("policyTenure")),
+      remarks: sessionStorage.getItem("remarks"),
+      risks: [],
+      covers: []
+    };
+
+    document.querySelectorAll("#riskTable tbody tr").forEach(r => {
+      if (r.cells.length < 5) return;
+
+      proposalData.risks.push({
+        insuredName: r.cells[0].innerText,
+        age: Number(r.cells[1].innerText),
+        gender: r.cells[2].innerText,
+        relation: r.cells[3].innerText,
+        occupation: r.cells[4].innerText
+      });
+    });
+
+    let totalSI = 0;
+    let netPremium = 0;
+
+    document.querySelectorAll("#coverTable tbody tr").forEach(r => {
+      if (r.cells.length < 4) return;
+
+      const si = Number(r.cells[2].innerText);
+      const pr = Number(r.cells[3].innerText);
+
+      totalSI += si;
+      netPremium += pr;
+
+      proposalData.covers.push({
+        coverCode: r.cells[0].innerText,
+        coverName: r.cells[1].innerText,
+        sumInsured: si,
+        premium: pr
+      });
+    });
+
+    if (proposalData.covers.length === 0) {
+      alert("❌ Please add at least one cover");
+      this.disabled = false;
+      this.innerText = "💾 Save Proposal";
+      return;
+    }
+
+    proposalData.totalSumInsured = totalSI;
+    proposalData.netPremium = +netPremium.toFixed(2);
+    proposalData.gst = +(netPremium * 0.18).toFixed(2);
+    proposalData.totalPremium =
+      +(proposalData.netPremium + proposalData.gst).toFixed(2);
+
     const res = await fetch("http://localhost:8092/proposal/save", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify(proposalData)
     });
 
-    const data = await res.json(); // ✅ read response first
+    const data = await res.json();
 
     if (!res.ok) {
       throw new Error(data.statusMsg || "Save failed");
     }
 
     const proposalNumber = data.statusMsg.split(" ").pop();
-
     navigator.clipboard.writeText(proposalNumber);
-
 
     alert(`✅ Proposal Saved Successfully\nProposal No : ${proposalNumber}`);
     window.location.href = "../buyPolicy.html";
 
   } catch (err) {
-    alert("❌ " + err.message); // ⭐ shows REAL backend error
+    alert("❌ " + err.message);
+    this.disabled = false;
+    this.innerText = "💾 Save Proposal";
   }
 };
+
 
 /* ============================================================
    DELETE ROW
