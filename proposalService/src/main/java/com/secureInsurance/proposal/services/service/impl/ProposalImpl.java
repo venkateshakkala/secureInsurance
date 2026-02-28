@@ -5,11 +5,14 @@ import com.secureInsurance.proposal.services.dao.CoverDao;
 import com.secureInsurance.proposal.services.dao.RiskDao;
 import com.secureInsurance.proposal.services.dto.*;
 import com.secureInsurance.proposal.services.entity.CustomerMapProposal;
+import com.secureInsurance.proposal.services.entity.ProposalCumPayments;
 import com.secureInsurance.proposal.services.entity.ProposalDetails;
 import com.secureInsurance.proposal.services.feignClient.CustomerClient;
 import com.secureInsurance.proposal.services.feignClient.DropDownFeignClient;
+import com.secureInsurance.proposal.services.mapper.ProposalCumPaymentsMapper;
 import com.secureInsurance.proposal.services.mapper.ProposalMapper;
 import com.secureInsurance.proposal.services.repository.CustomerMapProposalRepository;
+import com.secureInsurance.proposal.services.repository.ProposalCumPaymentsRepository;
 import com.secureInsurance.proposal.services.repository.ProposalRepository;
 import com.secureInsurance.proposal.services.service.IProposalService;
 import com.secureInsurance.proposal.services.utility.ProposalNumberGenerator;
@@ -29,15 +32,18 @@ public class ProposalImpl implements IProposalService {
 
     private final ProposalRepository proposalRepository;
     private final CustomerMapProposalRepository customerMapProposalRepository;
+    private final ProposalCumPaymentsRepository proposalCumPaymentsRepository;
     private final RiskDao riskDao;
     private final CoverDao coverDao;
     private final CustomerClient customerClient;
     private final DropDownFeignClient dropDownFeignClient;
     private final ProposalMapper proposalMapper;
     private JdbcTemplate jdbcTemplate;
+    private ProposalCumPaymentsMapper proposalCumPaymentsMapper;
     @Override
     @Transactional
     public String createProposal(ProposalDto proposalDto) {
+        CustomerMapProposal customerMapProposal = new CustomerMapProposal();
         try {
                 Optional<ProposalDetails> existing = proposalRepository.findByRequestId(proposalDto.getRequestId());
                 if (existing.isPresent()) {
@@ -101,7 +107,6 @@ public class ProposalImpl implements IProposalService {
             proposal.setRequestId(proposalDto.getRequestId());
 
             //mapping customer and proposal
-            CustomerMapProposal customerMapProposal = new CustomerMapProposal();
             customerMapProposal.setProposalNumber(proposalNumber);
             customerMapProposal.setMobileNumber(customerDto.getMobileNumber());
             customerMapProposalRepository.save(customerMapProposal);
@@ -115,6 +120,13 @@ public class ProposalImpl implements IProposalService {
             if (proposalDto.getCovers() != null) {
                 proposalDto.getCovers().forEach(c -> coverDao.saveCover(proposalNumber, c));
             }
+            //mapping to payments
+
+            ProposalCumPayments results = proposalCumPaymentsMapper.mapToProposalCumPayments(proposalDto,customerDto);
+            results.setProposalNumber(proposalNumber);
+            results.setStatus("PENDING");
+            proposalCumPaymentsRepository.save(results);
+
             return proposalNumber;
 
     }catch (Exception e){

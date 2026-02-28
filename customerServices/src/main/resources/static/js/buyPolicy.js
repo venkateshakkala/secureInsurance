@@ -8,7 +8,7 @@ document.getElementById("quotationBtn").addEventListener("click", () => {
 });
 
 document.getElementById("paymentBtn").addEventListener("click", () => {
-    window.location.href = "../payment/payment.html";
+    window.location.href = "http://localhost:8093/search.html";
 });
 
 document.getElementById("generatePolicyBtn").addEventListener("click", () => {

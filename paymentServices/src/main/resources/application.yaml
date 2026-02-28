@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: paymentServices
+  main :
+    banner-mode : off
+  datasource :
+    url : jdbc:oracle:thin:@localhost:1521/ORCLPDB
+    username : ins
+    password : ins123
+    driver-class-name : oracle.jdbc.OracleDriver
+server :
+  port : 8093
+
+

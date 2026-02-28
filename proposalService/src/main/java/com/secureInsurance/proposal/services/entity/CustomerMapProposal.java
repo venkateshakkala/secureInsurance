@@ -21,4 +21,6 @@ public class CustomerMapProposal {
     private String proposalNumber;
     @Column(name = "mobileNumber")
     private String mobileNumber;
+
+
 }
